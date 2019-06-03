@@ -1,0 +1,9 @@
+fugu-video-data.txt:
+Each line represents a data point for a different session, including
+ABR algorithm, congestion control, channel name, and SSIM index
+separated by spaces.
+
+fugu-buffer-data.txt:
+Each line represents a data point for a different session, including
+ABR algorithm, congestion control, total play time, and total rebuffer time
+separated by spaces.
