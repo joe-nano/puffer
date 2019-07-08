@@ -172,7 +172,6 @@ int run_ws_media_servers()
   }
 
   return proc_manager.wait();
-
 }
 
 int main(int argc, char * argv[])
