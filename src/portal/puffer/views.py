@@ -1,6 +1,5 @@
 import os
 import json
-import random
 from datetime import datetime
 from influxdb import InfluxDBClient
 
@@ -31,21 +30,11 @@ def terms(request):
 
 @login_required(login_url='/accounts/login/')
 def player(request):
-    # generate a random port or use a superuser-specified port
-    port = None
-    if request.user.is_superuser:
-        port = request.GET.get('port', None)
-
-    if port is None:
-        total_servers = settings.TOTAL_SERVERS
-        base_port = settings.WS_BASE_PORT
-        port = str(base_port + random.randint(1, total_servers))
-
     # parameters passed to Javascript stored in JSON
     params = {'session_key': request.session.session_key,
               'username': request.user.username,
               'debug': settings.DEBUG,
-              'port': port}
+              'port': settings.WS_BASE_PORT}
     context = {'params_json': json.dumps(params)}
 
     return render(request, 'puffer/player.html', context)
