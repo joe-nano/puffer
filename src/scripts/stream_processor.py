@@ -101,6 +101,11 @@ class BufferStream:
         s['last_cum_rebuf'] = None
         s['last_low_buf'] = None
 
+        # calculate percentage of viewing minutes that have rebuffered
+        s['next_minute'] = None
+        s['this_minute_rebuffered'] = False
+        s['rebuffered_minute'] = 0
+
         return s
 
     def update_map_list(self, ts, session):
@@ -165,6 +170,7 @@ class BufferStream:
                 self.out[abr_cc] = {}
                 self.out[abr_cc]['total_play'] = 0
                 self.out[abr_cc]['total_rebuf'] = 0
+                self.out[abr_cc]['rebuf_minute'] = 0
 
             session_play = ((s['max_play_time'] - s['min_play_time'])
                             / np.timedelta64(1, 's'))
@@ -172,6 +178,7 @@ class BufferStream:
 
             self.out[abr_cc]['total_play'] += session_play
             self.out[abr_cc]['total_rebuf'] += session_rebuf
+            self.out[abr_cc]['rebuf_minute'] += s['rebuffered_minute']
 
             del self.smap[session]
 
@@ -241,6 +248,18 @@ class BufferStream:
 
             if s['max_cum_rebuf'] is None or cum_rebuf > s['max_cum_rebuf']:
                 s['max_cum_rebuf'] = cum_rebuf
+
+        if s['next_minute'] is None:
+            s['next_minute'] = ts + np.timedelta64(1, 'm')
+        elif ts >= s['next_minute']:
+            s['next_minute'] += np.timedelta64(1, 'm')
+
+            if s['this_minute_rebuffered']:
+                s['rebuffered_minute'] += 1
+            s['this_minute_rebuffered'] = False
+
+        if s['last_cum_rebuf'] is not None and cum_rebuf > s['last_cum_rebuf']:
+            s['this_minute_rebuffered'] = True
 
         # update last_XXX
         s['last_ts'] = ts

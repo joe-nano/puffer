@@ -94,7 +94,7 @@ def plot_ssim_rebuffer(ssim, rebuffer):
     fig, ax = plt.subplots()
     title = '[{}, {}] (UTC)'.format(args.start_time, args.end_time)
     ax.set_title(title)
-    ax.set_xlabel('Time spent stalled (%)')
+    ax.set_xlabel('Rebuffered minutes (%)')
     ax.set_ylabel('Average SSIM (dB)')
     ax.grid()
 
@@ -106,10 +106,13 @@ def plot_ssim_rebuffer(ssim, rebuffer):
 
         total_rebuf = rebuffer[abr_cc]['total_rebuf']
         total_play = rebuffer[abr_cc]['total_play']
-        rebuf_rate = total_rebuf / total_play
 
         abr_cc_str += '\n({:.1f}m/{:.1f}h)'.format(total_rebuf / 60,
                                                    total_play / 3600)
+
+        total_minutes = np.ceil(total_play / 60)
+        rebuf_minutes = rebuffer[abr_cc]['rebuf_minute']
+        rebuf_rate = rebuf_minutes / total_minutes
 
         x = rebuf_rate * 100  # %
         y = ssim[abr_cc]
